@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Monitor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style>
+body { padding-top: 70px; }</style>
+</head>
+<body>
+
+
+    <div class="container">
+
+
+            <table class="table table-striped table-dark">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>DevID</th>
+                            <th>GtwID</th>
+                            <th>Date</th>
+                            <th>Payload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <% for(var i=0; i < ttn_msg.length; i++) { %>
+                            <tr>
+                                <td><%= i + 1%></td>
+                                <td><%= ttn_msg[i].devID %></td>
+                                <td><%= ttn_msg[i].payload.metadata.gateways[0].gtw_id %></td>
+                                <td><%= ttn_msg[i].date %></td>
+                                <td><%= ttn_msg[i].payload.payload_fields.ASCII %></td>
+                                
+                            </tr>
+                        <% } %>
+            
+                    </tbody>
+                </table>
+
+
+    </div>
+
+    
+</body>
+</html>
