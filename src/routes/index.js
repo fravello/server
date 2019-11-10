@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const model = require('../models/ttn_msg');
+const model = require('../models/mqtt_dash');
 
 router.get('/', async (req, res) => {
 
-    const ttn_msg = await model.find().sort({$natural:-1}).limit(20);
+    const mqtt_dash = await model.find().sort({$natural:-1}).limit(20);
 
     res.render('index',{
-        ttn_msg
+        mqtt_dash
     });
 
 

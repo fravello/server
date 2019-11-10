@@ -2,8 +2,59 @@ const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const mongodb = require('mongodb');
+const socketIO = require('socket.io');
+const http = require('http');
+
+var mqtt = require('mqtt');
+var config = require('./config');
 
 const app = express();
+const server = http.createServer(app); 
+const io = socketIO.listen(server);
+
+var mqttUri  = 'mqtt://' + config.mqtt.hostname + ':' + config.mqtt.port;
+var client   = mqtt.connect(mqttUri);
+
+client.on('connect', function () {
+    client.subscribe(config.mqtt.topics);
+});
+
+var mongoUri = 'mongodb://' + config.mongodb.hostname + ':' + config.mongodb.port;
+
+mongodb.MongoClient.connect(mongoUri, { useNewUrlParser: true }, function(error, database) {
+
+    if(error != null) {
+        throw error;
+    }
+
+    client.on('message', function (topic, message) {
+        var messageObject = {
+            topic: topic,
+            payload: message.toString(),
+            date: new Date().toLocaleString()
+        };
+
+        io.emit("mqtt_dash", messageObject);
+
+        db = database.db(config.mongodb.database);
+
+        db.collection(config.mongodb.collection).insertOne(messageObject, function(error, result) {
+            if(error != null) {
+                console.log("ERROR: " + error);
+            }
+        });
+    });
+});
+
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------------//
 
 // connection to db
 mongoose.connect('mongodb://localhost/iotdb',{useNewUrlParser: true,  useUnifiedTopology: true})
@@ -25,6 +76,6 @@ app.use(express.urlencoded({extended: false}))
 // routes
 app.use('/', indexRoutes);
 
-app.listen(app.get('port'), () => {
+server.listen(app.get('port'), () => {
   console.log(`server on port ${app.get('port')}`);
 });

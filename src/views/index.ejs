@@ -14,36 +14,41 @@ body { padding-top: 70px; }</style>
 
     <div class="container">
 
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>DevID</th>
+                    <th>Topic</th>
+                    <th>Date</th>
+                    <th>Payload</th>
+                </tr>
+            </thead>
+            <tbody>
 
-            <table class="table table-striped table-dark">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>DevID</th>
-                            <th>GtwID</th>
-                            <th>Date</th>
-                            <th>Payload</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <% for(var i=0; i < ttn_msg.length; i++) { %>
-                            <tr>
-                                <td><%= i + 1%></td>
-                                <td><%= ttn_msg[i].devID %></td>
-                                <td><%= ttn_msg[i].payload.metadata.gateways[0].gtw_id %></td>
-                                <td><%= ttn_msg[i].date %></td>
-                                <td><%= ttn_msg[i].payload.payload_fields.ASCII %></td>
-                                
-                            </tr>
-                        <% } %>
-            
-                    </tbody>
-                </table>
-
+                <% for(var i=0; i < mqtt_dash.length; i++) { %>
+                    <tr>
+                        <td><%= i + 1%></td>
+                        <td><%= mqtt_dash[i].devID %></td>
+                        <td><%= mqtt_dash[i].topic%></td>
+                        <td><%= mqtt_dash[i].date %></td>
+                        <td><%= mqtt_dash[i].payload%></td>
+                        
+                    </tr>
+                <% } %>
+    
+            </tbody>
+        </table>
 
     </div>
 
-    
+    <script  src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script>
+        const socket = io();
+
+        socket.on('mqtt_dash', function(data){
+            console.log(data);
+        });
+    </script>
 </body>
 </html>
