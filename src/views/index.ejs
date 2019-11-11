@@ -4,51 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Monitor</title>
+    <title>DASHBOARD</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <style>
 body { padding-top: 70px; }</style>
 </head>
 <body>
 
-
     <div class="container">
-
-        <table class="table table-striped table-dark">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>DevID</th>
-                    <th>Topic</th>
-                    <th>Date</th>
-                    <th>Payload</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                <% for(var i=0; i < mqtt_dash.length; i++) { %>
-                    <tr>
-                        <td><%= i + 1%></td>
-                        <td><%= mqtt_dash[i].devID %></td>
-                        <td><%= mqtt_dash[i].topic%></td>
-                        <td><%= mqtt_dash[i].date %></td>
-                        <td><%= mqtt_dash[i].payload%></td>
-                        
-                    </tr>
-                <% } %>
-    
-            </tbody>
-        </table>
+        <div class="row">
+            <div class="col-sm-6">
+                <canvas id="cnvTmp"></canvas>
+            </div>
+            <div class="col-sm-6">
+                    <canvas id="cnvHum"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card">
+                    <h1 id = 'aperId'></h1>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card">
+                    <h1 id = 'gasId'></h1>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <script  src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <script>
+
         const socket = io();
+
+        var tmpData = [];
+        var humData = [];
+        var count = 1;
 
         socket.on('mqtt_dash', function(data){
             console.log(data);
+            var obj = JSON.parse(data.payload);
+            if(obj.sensor == 'tmp'){
+
+                tmpData.push(parseInt(obj.value));
+                tmpChart.data.labels.push(count);
+                tmpChart.data.datasets[0].data = tmpData;
+                tmpChart.update();
+
+            }else if(obj.sensor == 'hum'){
+
+                humData.push(parseInt(obj.value));
+                humChart.data.labels.push(count);
+                humChart.data.datasets[0].data = humData;
+                humChart.update();
+
+            }else if(obj.sensor == 'aper'){
+                document.getElementById('aperId').innerHTML = obj.value;
+            }else if(obj.sensor == 'gas'){
+                document.getElementById('gasId').innerHTML = obj.value;
+            } 
+            count++;
         });
+
+        var tmpCtx = document.getElementById('cnvTmp').getContext('2d');
+        var humCtx = document.getElementById('cnvHum').getContext('2d');
+
+        var tmpChart = new Chart(tmpCtx, {
+            type: 'line',
+            data: {
+                labels: ['Serial'],
+                datasets: [{
+                    label: 'Temperatura C°',
+                    //backgroundColor: 'rgb(52, 73, 94)',
+                    borderColor: 'rgb(41, 128, 185)',
+                    data: []
+                }]
+            },
+            options: {}
+        });
+
+        var humChart = new Chart(humCtx, {
+            type: 'line',
+            data: {
+                labels: ['Serial'],
+                datasets: [{
+                    label: 'Humedad %',
+                    borderColor: 'rgb(71, 68, 185)',
+                    data: []
+                }]
+            },
+            options: {}
+        });
+       
     </script>
 </body>
 </html>

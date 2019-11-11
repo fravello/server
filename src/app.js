@@ -32,7 +32,7 @@ mongodb.MongoClient.connect(mongoUri, { useNewUrlParser: true }, function(error,
         var messageObject = {
             topic: topic,
             payload: message.toString(),
-            date: new Date().toLocaleString()
+            timestamp: new Date().getTime()
         };
 
         io.emit("mqtt_dash", messageObject);
@@ -46,12 +46,6 @@ mongodb.MongoClient.connect(mongoUri, { useNewUrlParser: true }, function(error,
         });
     });
 });
-
-
-
-
-
-
 
 
 //--------------------------------------------------------------------------------------------------------//
